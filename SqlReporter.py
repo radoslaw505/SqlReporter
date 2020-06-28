@@ -7,11 +7,11 @@ import time
 from sys import exit
 from os import listdir
 
-from properties import REPORTS_PATH, SQL_PATH, header_check, header, delimiter
+from properties import REPORTS_PATH, SQL_PATH, LOG_PATH, header_check, header, delimiter
 from LoggerSetup import LoggerSetup
 from oracle_config import user, passwd, host, port, sid
 
-log = LoggerSetup().get_logger('SqlReporter')
+log = LoggerSetup().get_logger('SqlReporter', LOG_PATH)
 
 class SqlReporter():
 
