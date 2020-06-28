@@ -4,6 +4,6 @@ REPORTS_PATH = 'C:/Users/rados/projects/Python/SqlReporter/reports/'
 LOG_PATH = 'C:/Users/rados/projects/Python/SqlReporter/logs/'
 
 ### SQL CONF
-sql_query = ''
-num_val = ''
-headers = ''
+header_check = True
+headers = 'ID, first_name, last_name' # String
+delimiter = ','
