@@ -18,7 +18,6 @@ class SqlReporter():
         self.check_args()
         self.check_directory(REPORTS_PATH)
         self.check_directory(SQL_PATH)
-        self.get_files(SQL_PATH)
 
 
     def get_files(self, path):
@@ -39,18 +38,18 @@ class SqlReporter():
                 log.info('You hase chosen: {}. Next step is to execute this query on database.'.format(file_list[int(value) - 1]))
                 resume = input('Do you want to continue?[Y/n]: ')
                 if resume != 'Y':
-                    log.info('You enter {}. Ending script.'.format(resume))
+                    log.warning('You enter {}. Ending script.'.format(resume))
                     sys.exit(1)
                 else:
                     sql_file = path + file_list[int(value) - 1]
             except Exception as ex:
-                log.error("Invalid value for request. The script ends.", exc_info=True)
+                log.error("Invalid value for request: {ex}".format(ex), exc_info=True)
                 sys.exit(1)
         if os.stat(sql_file).st_size != 0:
             self.execute_sql(sql_file, REPORTS_PATH, delimiter)
             self.add_headers(sql_file, REPORTS_PATH, header_check, header)    
         else:
-            log.warning('Chosen file {} is empty. The script ends.'.format(sql_file))
+            log.warning('Chosen file {} is empty. The script ends.'.format(sql_file.split('/')[-1]))
             sys.exit(1)
 
 
@@ -86,20 +85,24 @@ class SqlReporter():
 
     def add_headers(self, file, path, header_check, header):
         log.debug('Calling add_headers() method.')
-        if header_check:
+        try:
             report_file = path + file.split('/')[-1].split('.')[0] + '.csv'
-            with open(report_file, 'r') as readFile:
-                reader = csv.reader(readFile)
-                lines = list(reader)
-                lines.insert(0, header)
-            with open(report_file, 'w', newline='') as writeFile:
-                writer = csv.writer(writeFile)
-                writer.writerows(lines)
-            readFile.close()
-            writeFile.close()
-            log.info('Header has been added to report file: {}.'.format(report_file.split('/')[-1]))
-        else:
-            log.info('Header NOT added to report file: {}.'.format(report_file.split('/')[-1]))
+            if header_check:
+                with open(report_file, 'r') as readFile:
+                    reader = csv.reader(readFile)
+                    lines = list(reader)
+                    lines.insert(0, header)
+                with open(report_file, 'w', newline='') as writeFile:
+                    writer = csv.writer(writeFile)
+                    writer.writerows(lines)
+                readFile.close()
+                writeFile.close()
+                log.info('Header has been added to report file: {}.'.format(report_file.split('/')[-1]))
+            else:
+                log.info('Header NOT added to report file: {}.'.format(report_file.split('/')[-1]))
+        except Exception as ex:
+            log.error('An error occured while executing add_headers() method: {}'.format(ex), exc_info=True)
+        
 
 
     def check_directory(self, path):
@@ -116,3 +119,7 @@ class SqlReporter():
 
 if __name__ == "__main__":
     reporter = SqlReporter()
+    try:
+        reporter.get_files(SQL_PATH)
+    except Exception as ex:
+        log.error('An error occured while executing get_files() method: {}'.format(ex), exc_info=True)
