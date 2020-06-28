@@ -6,7 +6,7 @@ import csv
 from sys import exit
 from os import listdir
 
-from properties import REPORTS_PATH, SQL_PATH, headers, delimiter
+from properties import REPORTS_PATH, SQL_PATH, header, delimiter
 from LoggerSetup import LoggerSetup
 from oracle_config import user, passwd, host, port, sid
 
@@ -27,6 +27,9 @@ class SqlReporter():
         if len(sys.argv) == 2:
             if sys.argv[1] in file_list:
                 sql_file = path + sys.argv[1]
+            else:
+                log.error('File {} not found in {} directory.'.format(sys.argv[1], path))
+                sys.exit(1)
         else:
             log.info('Choose file from list to execute:')
             for count, sql in enumerate(file_list):
