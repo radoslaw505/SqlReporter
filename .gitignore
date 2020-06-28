@@ -4,3 +4,4 @@
 /reports/*
 /sql/*
 /__pycache__/*
+oracle_config.py
