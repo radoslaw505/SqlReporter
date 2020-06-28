@@ -6,7 +6,7 @@ import csv
 from sys import exit
 from os import listdir
 
-from properties import REPORTS_PATH, SQL_PATH, header, delimiter
+from properties import REPORTS_PATH, SQL_PATH, header_check, header, delimiter
 from LoggerSetup import LoggerSetup
 from oracle_config import user, passwd, host, port, sid
 
@@ -47,14 +47,14 @@ class SqlReporter():
                 log.error("Invalid value for request. The script ends.", exc_info=True)
                 sys.exit(1)
         if os.stat(sql_file).st_size != 0:
-            self.execute_sql(sql_file, delimiter, REPORTS_PATH)
-            
+            self.execute_sql(sql_file, REPORTS_PATH, delimiter)
+            self.add_headers(sql_file, REPORTS_PATH, header_check, header)    
         else:
             log.warning('Chosen file {} is empty. The script ends.'.format(sql_file))
             sys.exit(1)
 
 
-    def execute_sql(self, file, deli, path):
+    def execute_sql(self, file, path, delimiter):
         log.debug('Calling oracle_insert() method.')
         try:
             dsn = cx_Oracle.makedsn(host, port, sid)
@@ -70,7 +70,7 @@ class SqlReporter():
             row = cur.fetchall()
             report_file = path + file.split('/')[-1].split('.')[0] + '.csv'
             with open(report_file, 'a', newline='') as report:
-                a = csv.writer(report, delimiter=deli)
+                a = csv.writer(report, delimiter=delimiter)
                 a.writerows(row)
             log.info('Report generation for {} database completed.'.format(dsn))
         except Exception as ex:
@@ -84,9 +84,19 @@ class SqlReporter():
                 pass
 
 
-    def add_headers(self, header_check, headers):
+    def add_headers(self, file, path, header_check, header):
         if header_check:
-            pass
+            report_file = path + file.split('/')[-1].split('.')[0] + '.csv'
+            with open(report_file, 'r') as readFile:
+                reader = csv.reader(readFile)
+                lines = list(reader)
+                lines.insert(0, header)
+            with open(report_file, 'w', newline='') as writeFile:
+                writer = csv.writer(writeFile)
+                writer.writerows(lines)
+            readFile.close()
+            writeFile.close()
+
 
     def check_directory(self, path):
         log.debug('Calling check_directory() method for {}.'.format(path))
