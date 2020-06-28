@@ -1,2 +1,6 @@
 /.venv/*
 /.vscode/*
+/logs/*
+/reports/*
+/sql/*
+/__pycache__/*
