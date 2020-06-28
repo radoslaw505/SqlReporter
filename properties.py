@@ -5,5 +5,5 @@ LOG_PATH = 'C:/Users/rados/projects/Python/SqlReporter/logs/'
 
 ### SQL CONF
 header_check = True
-header = 'ID, first_name, last_name' # String
+header = ['ID', 'first_name', 'last_name'] # List
 delimiter = ','
