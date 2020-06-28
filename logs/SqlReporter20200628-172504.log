@@ -1,4 +1,0 @@
-[2020-06-28 17:25:04,433][12600 ][INFO   ]: Logging has been set up. Control file: C:/Users/rados/projects/Python/SqlReporter/logs/SqlReporter20200628-172504.log
-[2020-06-28 17:25:04,434][12600 ][DEBUG  ]: Calling check_directory() method for C:/Users/rados/projects/Python/SqlReporter/reports/.
-[2020-06-28 17:25:04,435][12600 ][DEBUG  ]: Calling check_directory() method for C:/Users/rados/projects/Python/SqlReporter/sql/.
-[2020-06-28 17:25:04,436][12600 ][DEBUG  ]: Calling get_files() method.
