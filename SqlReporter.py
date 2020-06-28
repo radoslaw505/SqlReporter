@@ -6,6 +6,7 @@ import csv
 import time
 from sys import exit
 from os import listdir
+from datetime import datetime
 
 from properties import REPORTS_PATH, SQL_PATH, LOG_PATH, header_check, header, delimiter
 from LoggerSetup import LoggerSetup
@@ -22,7 +23,8 @@ class SqlReporter():
 
 
     def get_files(self, path):
-        log.debug('Calling get_files() method.')
+        start_time = datetime.now()
+        log.debug('Calling main method: get_files().')
         file_list = [f for f in listdir(path) if f.split('.')[-1] == 'sql']
         if len(sys.argv) == 2:
             if sys.argv[1] in file_list:
@@ -52,6 +54,7 @@ class SqlReporter():
         else:
             log.warning('Chosen file {} is empty. The script ends.'.format(sql_file.split('/')[-1]))
             sys.exit(1)
+        log.info('Report generation is complete. Script duration: {}.'.format(datetime.now() - start_time))
 
 
     def execute_sql(self, file, path, delimiter):
