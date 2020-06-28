@@ -85,6 +85,7 @@ class SqlReporter():
 
 
     def add_headers(self, file, path, header_check, header):
+        log.debug('Calling add_headers() method.')
         if header_check:
             report_file = path + file.split('/')[-1].split('.')[0] + '.csv'
             with open(report_file, 'r') as readFile:
@@ -96,6 +97,9 @@ class SqlReporter():
                 writer.writerows(lines)
             readFile.close()
             writeFile.close()
+            log.info('Header has been added to report file: {}.'.format(report_file.split('/')[-1]))
+        else:
+            log.info('Header NOT added to report file: {}.'.format(report_file.split('/')[-1]))
 
 
     def check_directory(self, path):
