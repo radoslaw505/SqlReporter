@@ -3,6 +3,7 @@ import os
 import os.path
 import cx_Oracle
 import csv
+import time
 from sys import exit
 from os import listdir
 
@@ -100,9 +101,10 @@ class SqlReporter():
                 log.info('Header has been added to report file: {}.'.format(report_file.split('/')[-1]))
             else:
                 log.info('Header NOT added to report file: {}.'.format(report_file.split('/')[-1]))
+            renamed_report = report_file.split('.')[0] + time.strftime("%Y%m%d-%H%M%S") + '.csv'
+            os.rename(report_file, renamed_report)
         except Exception as ex:
-            log.error('An error occured while executing add_headers() method: {}'.format(ex), exc_info=True)
-        
+            log.error('An error occured while executing add_headers() method: {}'.format(ex), exc_info=True)     
 
 
     def check_directory(self, path):
