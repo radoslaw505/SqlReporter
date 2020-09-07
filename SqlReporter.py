@@ -12,11 +12,12 @@ from properties import REPORTS_PATH, SQL_PATH, LOG_PATH, header_check, header, d
 from LoggerSetup import LoggerSetup
 from oracle_config import user, passwd, host, port, sid
 
-log = LoggerSetup().get_logger('SqlReporter', LOG_PATH)
 
 class SqlReporter():
 
     def __init__(self):
+        self.log = LoggerSetup().get_logger('SqlReporter', LOG_PATH)
+
         self.check_args()
         self.check_directory(REPORTS_PATH)
         self.check_directory(SQL_PATH)
@@ -24,41 +25,41 @@ class SqlReporter():
 
     def get_files(self, path):
         start_time = datetime.now()
-        log.debug('Calling main method: get_files().')
+        self.log.debug('Calling main method: get_files().')
         file_list = [f for f in listdir(path) if f.split('.')[-1] == 'sql']
         if len(sys.argv) == 2:
             if sys.argv[1] in file_list:
                 sql_file = path + sys.argv[1]
             else:
-                log.error('File {} not found in {} directory.'.format(sys.argv[1], path))
+                self.log.error('File {} not found in {} directory.'.format(sys.argv[1], path))
                 sys.exit(1)
         else:
-            log.info('Choose file from list to execute:')
+            self.log.info('Choose file from list to execute:')
             for count, sql in enumerate(file_list):
                 print( '{0}) {1}'.format(count + 1, sql))
             try:
                 value = input("Please enter a file number: ")
-                log.info('You hase chosen: {}. Next step is to execute this query on database.'.format(file_list[int(value) - 1]))
+                self.log.info('You hase chosen: {}. Next step is to execute this query on database.'.format(file_list[int(value) - 1]))
                 resume = input('Do you want to continue?[Y/n]: ')
                 if resume != 'Y':
-                    log.warning('You enter {}. Ending script.'.format(resume))
+                    self.log.warning('You enter {}. Ending script.'.format(resume))
                     sys.exit(1)
                 else:
                     sql_file = path + file_list[int(value) - 1]
             except Exception as ex:
-                log.error("Invalid value for request: {ex}".format(ex), exc_info=True)
+                self.log.error("Invalid value for request: {ex}".format(ex), exc_info=True)
                 sys.exit(1)
         if os.stat(sql_file).st_size != 0:
             self.execute_sql(sql_file, REPORTS_PATH, delimiter)
             self.add_headers(sql_file, REPORTS_PATH, header_check, header)    
         else:
-            log.warning('Chosen file {} is empty. The script ends.'.format(sql_file.split('/')[-1]))
+            self.log.warning('Chosen file {} is empty. The script ends.'.format(sql_file.split('/')[-1]))
             sys.exit(1)
-        log.info('Report generation is complete. Script duration: {}.'.format(datetime.now() - start_time))
+        self.log.info('Report generation is complete. Script duration: {}.'.format(datetime.now() - start_time))
 
 
     def execute_sql(self, file, path, delimiter):
-        log.debug('Calling oracle_insert() method.')
+        self.log.debug('Calling oracle_insert() method.')
         try:
             dsn = cx_Oracle.makedsn(host, port, sid)
             conn = cx_Oracle.connect(
@@ -75,9 +76,9 @@ class SqlReporter():
             with open(report_file, 'a', newline='') as report:
                 a = csv.writer(report, delimiter=delimiter)
                 a.writerows(row)
-            log.info('Report generation for {} database completed.'.format(dsn))
+            self.log.info('Report generation for {} database completed.'.format(dsn))
         except Exception as ex:
-            log.error('An error occured while connecting to database: {}'.format(ex), exc_info=True)
+            self.log.error('An error occured while connecting to database: {}'.format(ex), exc_info=True)
             sys.exit(1)
         finally:
             try:
@@ -88,7 +89,7 @@ class SqlReporter():
 
 
     def add_headers(self, file, path, header_check, header):
-        log.debug('Calling add_headers() method.')
+        self.log.debug('Calling add_headers() method.')
         try:
             report_file = path + file.split('/')[-1].split('.')[0] + '.csv'
             if header_check:
@@ -101,20 +102,20 @@ class SqlReporter():
                     writer.writerows(lines)
                 readFile.close()
                 writeFile.close()
-                log.info('Header has been added to report file: {}.'.format(report_file.split('/')[-1]))
+                self.log.info('Header has been added to report file: {}.'.format(report_file.split('/')[-1]))
             else:
-                log.info('Header NOT added to report file: {}.'.format(report_file.split('/')[-1]))
+                self.log.info('Header NOT added to report file: {}.'.format(report_file.split('/')[-1]))
             renamed_report = report_file.split('.')[0] + time.strftime("%Y%m%d-%H%M%S") + '.csv'
             os.rename(report_file, renamed_report)
         except Exception as ex:
-            log.error('An error occured while executing add_headers() method: {}'.format(ex), exc_info=True)     
+            self.log.error('An error occured while executing add_headers() method: {}'.format(ex), exc_info=True)     
 
 
     def check_directory(self, path):
-        log.debug('Calling check_directory() method for {}.'.format(path))
+        self.log.debug('Calling check_directory() method for {}.'.format(path))
         if not os.path.exists(path):
             os.mkdir(path)
-            log.info('Directory {} created.'.format(path))
+            self.log.info('Directory {} created.'.format(path))
 
     
     def check_args(self):
@@ -127,4 +128,4 @@ if __name__ == "__main__":
     try:
         reporter.get_files(SQL_PATH)
     except Exception as ex:
-        log.error('An error occured while executing get_files() method: {}'.format(ex), exc_info=True)
+        raise Exception(ex)
